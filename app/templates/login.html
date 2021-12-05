@@ -1,0 +1,81 @@
+
+{% extends "layouts/base.html" %}
+
+{% block title %} Авторизація {% endblock %}
+
+{% block content%}
+    <div class="mt-5 bg-soft d-flex align-items-center">
+        <div class="container">
+            <p class="text-center">
+
+            </p>
+            <div class="row justify-content-center">
+                <div class="bg-image col-12 mt-5 d-flex align-items-center justify-content-center ">
+                <div class="bg-white shadow border-0 rounded border-light p-4 p-lg-5 form-panel">
+                    <div class="text-center text-md-center mb-4 mt-md-0">
+                        <h1 class="mb-0 h3">
+                             Форма авторизації:
+                        </h1>
+                        <p class="pt-3">
+                            {% if msg %}
+                                {{ msg | safe }}
+                            {% else %}
+                                Введіть свої облікові дані
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <form action="" method="post" class="mt-2" role="form">
+
+                         {{ form.hidden_tag() }}
+
+                        <div class="form-group mb-4">
+                            <label for="email">Електронна адреса</label>
+                            <div class="input-group">
+                                <span class="input-group-text" id="basic-addon1">
+                                    <span class="fas fa-user-circle"></span>
+                                </span>
+                                {{ form.email(placeholder="Email", class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="form-group mb-4">
+                                <label for="password">Ваш пароль</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" id="basic-addon2">
+                                        <span class="fas fa-unlock-alt"></span>
+                                    </span>
+                                    {{ form.password(placeholder="Password", class="form-control", type="password") }}
+                                </div>
+                            </div>
+
+                        <div class="d-flex justify-content-between align-items-top mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="remember">
+                                <label class="form-check-label mb-0" for="remember">
+                                  Запам’ятати мене
+                                </label>
+                            </div>
+                            <!--<div><a href="/page-forgot-password.html" class="small text-right">Lost password?</a></div>-->
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" name="login" class="btn btn-dark">Увійти</button>
+                    </div>
+                    </form>
+
+                    <br />
+                    <div class="d-flex justify-content-center align-items-center mt-4">
+                        <span class="fw-normal">
+                            Не зареєстровані?
+                            <a href="{{ url_for('authentication.register') }}" class="fw-bold">Створити аккаунт</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+{% endblock content%}
