@@ -1,0 +1,8 @@
+DEBUG = False
+SECRET_KEY = 'secret'
+SQLALCHEMY_DATABASE_URI = "sqlite:///../instance/flask-crud.db"
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+UPLOAD_FOLDER = "uploads/"
+DETECTION_API_URL = "http://127.0.0.1:4000/"
+DETECTION_THRESHOLD = 0.2

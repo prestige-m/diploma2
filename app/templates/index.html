@@ -1,8 +1,209 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/index_base.html" %}
+
+{% block title %} Index {% endblock %}
 
 {% block content%}
-    <div class="container">
-            <h3> Welcome to pythonplay portal! </h3> <br>
-            <h3> Happy Learning! </h3>
+        <!-- Header-->
+        <header id="header" class="bg-primary bg-gradient text-white">
+            <div class="header-content">
+                <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="text-container">
+                            <h1>ДОДАТОК <br>ДЛЯ <br>РОЗПІЗНАВАННЯ ОБЛИЧ </h1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="image-container">
+                            <img class="img-fluid" src="/static/assets/img/face_recogniton.png" alt="alternative">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </header>
+
+        <!-- Services section-->
+        <section class="tabs" id="services">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 text-center mb-3">
+                        <h2><i class="fas fa-wrench"></i>СЕРВІСИ</h2>
+                        <div class="p-heading p-large">Завантажте зображення для виконання розпізнання або додайте нове зображення у систему.</div>
+                    </div>
+                </div>
+                <div class="row">
+
+                <ul class="nav nav-tabs" id="tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="nav-tab-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true"><i class="far fa-image"></i>ДОДАТИ ЗОБРАЖЕННЯ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="nav-tab-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2" aria-selected="false"><i class="fas fa-cogs"></i>РОЗПІЗНАТИ ЗОБРАЖЕННЯ</a>
+                    </li>
+                </ul>
+                <!-- Tabs Content-->
+                <div class="tab-content d-flex justify-content-center" id="MyTabsContent">
+
+                    <!-- Tab -->
+                    <div class="tab-pane fade" id="tab-2" role="tabpanel" aria-labelledby="tab-2">
+                        <div class="container">
+                            <form action="/upload"  method="post" enctype="multipart/form-data" >
+                                <div class="row">
+                                    <div class = "col-md-12">
+                                        <label class="btn btn-default btn-file btn-block">
+                                            <i class="far fa-file-image"></i>ЗАВАНТАЖИТИ ФАЙЛ
+                                            <input type="file" name="image" id="picture" required="true" accept="image/*" onchange="showImage2(event)" style="display: none;">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class = "col-md-12">
+                                        <button id="submit-image" type="submit" class="btn btn-block"><i class="far fa-laugh-wink"></i>РОЗПІЗНАТИ&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                                    </div>
+                                </div> <!-- end of row -->
+
+                             </form>
+
+                            <div class="row mt-4">
+                                <div class = "col-md-6 col-lg-6">
+                                    <img class="image-preview mx-auto" id="converted-image2" width="300" height="300" style="display: none;">
+                                </div>
+
+                            </div>
+
+                        </div> <!-- end of container -->
+                    </div> <!-- end of tab-pane -->
+                    <!-- end of tab -->
+                    <!--TAB 2 -->
+                    <div class="tab-pane fade show active" id="tab-1" role="tabpanel" aria-labelledby="tab-1">
+                        <div class="container">
+
+                            <form action="/add-image"  method="post" enctype="multipart/form-data" >
+                            <div class="row">
+                                <div class = "col-md-12">
+                                    <label class="btn btn-default btn-file btn-block">
+                                        <i class="far fa-file-image"></i>ЗАВАНТАЖИТИ ФАЙЛ&nbsp;&nbsp;
+                                        <input type="file" name="image" id="picture" required="true" accept="image/*" onchange="showImage(event)" style="display: none;">
+                                    </label>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class = "col-md-12">
+                                  <button id="submit-image" type="submit" class="btn btn-block" ><i class="fas fa-plus"></i>ДОДАТИ ЗОБРАЖЕННЯ</button>
+                                </div>
+                            </div> <!-- end of row -->
+                            </form>
+
+
+                            <div class="row mt-4">
+                                <div class = "col-md-6 col-lg-6">
+                                    <img class="image-preview mx-auto" id="converted-image" width="300" height="300" style="display: none;">
+                                </div>
+
+                            </div>
+
+
+                        </div> <!-- end of container -->
+
+
+                <div class="row mt-4">
+                    <div class = "col-md-12">
+                         {% if init %}
+                            {% if face_recognized %}
+                                <div class="alert alert-success" style="margin-top:18px;">
+                                    <strong>Yes!</strong> {{ num_faces }} face(s) detected!
+                                </div>
+                                {% if image_to_show %}
+                                    <div>
+                                        <img class="image-preview mx-auto" src="{{ image_to_show }}" width="450" height="400">
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="alert alert-danger" style="margin-top:18px;">
+                                    <strong>Nope!</strong> No face detected
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                </div>
+
+                </div>
+                </div>
+
+
+
+            </div>
+        </section>
+
+        <section id="details" class="basic-2">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>ІНФОРМАЦІЯ ПРО ПРОЄКТ</h2>
+                    <div class="p-heading p-large">Розробник: Шевченко Володимир</div>
+                </div> <!-- end of col -->
+            </div>
+
+                <div class="text-container">
+                    <h4>DESCRIPTION</h4>
+                    	<p>The project is called the Face Mask Detection where it uses facial and object recognition to accurately distinguish those with or without masks. The user would upload an image and the program would analyze it and output whether or not they're wearing a mask. This project is needed to prevent higher risk of spreading the coronavirus and to enforce those who don't follow proper guidelines to wear a mask.</p>
+					<h4>FEATURES</h4>
+						<ul>
+                    		<li>Python</li>
+                    		<li>Microsoft Azure Functions</li>
+                    		<li>Deep Learning</li>
+                    		<li>Tensorflow</li>
+                    			<ul>
+                    				<li>Keras</li>
+                    			</ul>
+                    		<li>APIs</li>
+                    	</ul>
+                    <h4>IMPORTANCE</h4>
+                    	<p>Wearing a facial mask in public has become a mandatory requirement since the start of COVID-19. They’re important in public space (ex. stadiums, airports, warehouses, and other crowded spaces) where foot traffic is heavy and safety regulations are critical to safeguarding everyone’s health.</p>
+					<h4>PROBLEM &amp; SOLUTION</h4>
+						<ul>
+                    		<li><strong>Problem: </strong>There are people who don’t follow the proper guidelines and thus, create a higher risk of spreading this contagious virus.</li>
+                    		<li><strong>Solution: </strong>Thus, we need to find a solution to figure out how to detect those who don’t wear and mask and enforce them to put one on. This program will analyze images and/or videos of faces and will say whether or not they’re wearing a mask. It will be able to accurately distinguish those with or without masks.</li>
+                    	</ul>
+					<h4>FUTURE PLANS</h4>
+						<ul>
+                    		<li>In the future, I want to integrate this into a webcam where it’s able to detect LIVE of whether or not the person is wearing a mask or not.</li>
+                    		<li>Implementing a Real-time, AI-Based, Face Mask Detector Application for COVID-19</li>
+                    		<li>However, this might not require Azure Functions so it would stray a different path.</li>
+                    	</ul>
+					<h4>Links</h4>
+						<ul>
+    						<li><a href="#">Github</a></li>
+                    	</ul>
+
+                </div> <!-- end of text-container -->
+
+        </div> <!-- end of container -->
+    </section>
+
+    <div class="counter">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <!-- Counter -->
+                    <div id="counter">
+                        <div class="cell">
+                            <div class="counter-value number-count" data-count="127">127</div>
+                            <p class="counter-info">Зображень завантажено</p>
+                        </div>
+                    </div>
+                    <!-- end of counter -->
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
     </div>
+
 {% endblock content%}

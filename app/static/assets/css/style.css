@@ -1,0 +1,214 @@
+
+.navbar-custom {
+    box-shadow: none !important;
+    background: transparent !important;
+    font: 700 0.9rem/2rem "Montserrat", sans-serif !important;
+    padding: 2.125rem 5rem 2.125rem 5rem !important;
+
+}
+
+.navbar-nav {
+   margin-left: auto !important;
+}
+
+body, html {
+    width: 100% !important;
+    height: 100% !important;
+    background-color: #00152A;
+}
+
+body, p {
+    color: #f1f1f8 !important;
+    font: 400 0.875rem/1.375rem "Open Sans", sans-serif !important;
+}
+
+.top-nav-collapse {
+    padding: 0.7rem 5rem 0.7rem 5rem !important;
+    box-shadow: 0 0.0625rem 0.375rem 0 rgba(0, 0, 0, 0.1) !important;
+    background-color: #00152A !important;
+}
+
+.nav-link:hover, .nav-link.active {
+   color: #00c9db !important;
+}
+
+.nav-link {
+    color: #fff !important;
+}
+
+#header {
+    background: url('../img/background.jpg') center center no-repeat !important;
+    background-size: cover !important;
+}
+
+.header-content {
+    padding-top: 20rem !important;
+    padding-bottom: 20rem !important;
+    height: 100vh !important;
+    text-align: left !important;
+}
+
+#header h1 {
+    margin-bottom: 1rem !important;
+    margin-top: 0 !important;
+    color: #f1f1f8 !important;
+    font: 700 2.5rem/2.875rem "Montserrat", sans-serif !important;
+    font-size: 2.5rem !important;
+}
+
+.tabs {
+    padding-top: 6.5rem !important;
+    padding-bottom: 6.5rem !important;
+    background-color: #00152A !important;
+}
+
+.tabs .nav-tabs {
+    margin-right: auto !important;
+    margin-bottom: 2.5rem !important;
+    margin-left: auto !important;
+    justify-content: center !important;
+    border: none !important;
+}
+
+.tabs .nav-link.active, .tabs .nav-link:hover {
+    border-left: none !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: 0.1875rem solid #00c9db !important;
+    background-color: transparent !important;
+    color: #00c9db !important;
+    padding: 0.5rem 1.375rem 0.25rem 1.375rem !important;
+}
+
+tabs .nav-link {
+    margin-bottom: 1rem !important;
+    padding: 0.5rem 1.375rem 0.25rem 1.375rem !important;
+    border: none !important;
+    border-bottom: 0.1875rem solid #f1f1f8 !important;
+    border-radius: 0 !important;
+    color: #f1f1f8 !important;
+    font: 700 1rem/1.75rem "Montserrat", sans-serif !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+i {
+    padding-right: 5px;
+}
+
+.btn {
+    border: 2px solid black !important;
+    color: white !important;
+    background-color: #00C9DB !important;
+    padding: 8px 20px !important;
+    border-radius: 8px !important;
+    font-size: 20px !important;
+    font-weight: bold !important;
+    width: 302px !important;
+}
+
+.upload-btn-wrapper {
+    position: relative !important;
+    overflow: hidden !important;
+    display: inline-block !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+}
+
+.upload-btn-wrapper input[type="file"] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+
+.basic-2 {
+    background: url('../img/background.jpg') center center no-repeat !important;
+    background-size: cover !important;
+}
+
+.basic-2 h2 {
+    text-align: center !important;
+    margin-bottom: 1.125rem !important;
+}
+
+.p-heading {
+    width: 44% !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    margin-bottom: 0 !important;
+    text-align: center !important;
+}
+
+.basic-2 .text-container {
+    margin-top: 3.5rem !important;
+    margin-left: 4rem !important;
+    margin-right: 1.5rem !important;
+    background-color: #00152A !important;
+    padding: 30px !important;
+    border: solid white 5px !important;
+}
+
+h2 {
+     margin-bottom: 2rem !important;
+}
+
+h4 {
+    color: #f1f1f8 !important;
+    font: 700 1.375rem/1.75rem "Montserrat", sans-serif !important;
+}
+
+.counter {
+    padding-top: 6.5rem !important;
+    padding-bottom: 5.375rem !important;
+    background-color: #00152A !important;
+    background-image: url('../img/background.jpg') !important;
+    text-align: center !important;
+}
+
+.counter #counter .counter-value {
+    color: #f1f1f8 !important;
+    font: 700 4.25rem/4.5rem "Montserrat", sans-serif !important;
+    vertical-align: middle !important;
+}
+
+.counter #counter .cell {
+    display: inline-block !important;
+    font-size: 1.5em !important;
+    margin-right: 2.5rem !important;
+    margin-left: 2.5rem !important;
+    margin-bottom: 2rem !important;
+}
+
+.copyright {
+    padding-top: 2rem !important;
+    padding-bottom: 1.0rem !important;
+    background-color: #00152A !important;
+    text-align: center !important;
+}
+
+section {
+  padding-top: 9rem !important;
+  padding-bottom: 9rem !important;
+}
+
+.row > * {
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+#converted-image {
+    width: 300px;
+    height: 300px;
+    display: none;
+}
+
+.image-preview {
+    background-image: url('../img/no-image-available.png');
+    background-repeat: no-repeat;
+    background-size:100% 100%;
+}

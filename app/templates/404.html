@@ -1,9 +1,22 @@
-{% extends 'layout.html' %}
+{% extends "layouts/index_base.html" %}
 
-{% block content%}
-<div class="container">
-        <h3> Sorry, page not found! </h3> <br>
-        <span class="label label-success"> <a href="{{url_for('authentication.login')}}"> Back to Login</a> </span>
-    </div>
+{% block title %} Error 404 {% endblock %}
 
-{% endblock content%}
+{% block content %}
+
+    <main>
+        <section class="vh-100 d-flex align-items-center justify-content-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-center d-flex align-items-center justify-content-center">
+                        <div>
+                            <img class="img-fluid w-75" src="/static/assets/img/404.svg" alt="404 not found">
+                            <h1 class="mt-5">Сторінка <span class="fw-bolder text-primary">не знайдена</span></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+{% endblock content %}

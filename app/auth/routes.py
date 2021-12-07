@@ -5,16 +5,16 @@ from app.auth.models import User
 from flask_login import login_user, logout_user, login_required, current_user
 
 
-# @authentication.route('/')
-# def route_default():
-#     return redirect(url_for('authentication.login'))
+@authentication.route('/')
+def route_default():
+    return redirect(url_for('authentication.login'))
 
 
 @authentication.route('/register', methods=['GET', 'POST'])
 def register():
 
     if current_user.is_authenticated:
-        flash('You are already logged in.')
+        flash('Ви вже авторизовані!', "warning")
         return redirect(url_for('authentication.homepage'))
     form = RegistrationForm()
 
@@ -22,16 +22,16 @@ def register():
 
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            flash("Користувач з такою електронною адресою вже існує!")
+            flash("Користувач з такою електронною адресою вже існує!", "error")
             return render_template('registration.html', form=form, success=False)
 
         User.create_user(
-            user=form.name.data,
+            username=form.username.data,
             email=form.email.data,
             password=form.password.data
         )
-        flash("Registration Successful")
-        return redirect(url_for('authentication.login'))
+        flash("Реєстрація успішна!", "success")
+        return redirect(url_for('authentication.homepage'))
         
     return render_template('registration.html', form=form)
 
@@ -42,13 +42,13 @@ def index():
 @authentication.route('/login', methods=['GET','POST'])
 def login():
     if current_user.is_authenticated:
-        flash('You are already logged in.')
+        flash('Ви вже авторизовані!', "warning")
         return redirect(url_for('authentication.homepage'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if not user or not user.check_password(form.password.data):
-            flash("Invalid credentials")
+            flash('Введено некоректні дані!', "error")
             return redirect(url_for('authentication.login'))
         
         login_user(user, form.stay_loggedin.data)
@@ -59,13 +59,12 @@ def login():
 
 @authentication.route('/homepage')
 def homepage():
-    return render_template('homepage.html')
+    return render_template('index.html')
 
 
 @authentication.route('/logout', methods=['GET'])
 @login_required
 def logout():
-    #session.clear()  
     logout_user()
     return redirect(url_for('authentication.login'))
 

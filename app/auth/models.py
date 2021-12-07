@@ -17,9 +17,9 @@ class User(UserMixin, db.Model):
         return bcrypt.check_password_hash(self.password, password)
 
     @classmethod
-    def create_user(cls, user, email, password):
+    def create_user(cls, username, email, password):
 
-        user = cls(username=user,
+        user = cls(username=username,
                    email=email,
                    password=bcrypt.generate_password_hash(password).decode('utf-8')
             )

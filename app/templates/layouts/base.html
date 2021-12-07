@@ -5,41 +5,34 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>
-    Flask Volt Dashboard - {% block title %}{% endblock %} | AppSeed
+    Face App {% block title %}{% endblock %}
 </title>
 
 <!-- BOOTSTRAP -->
-<link type="text/css" href="/static/assets/css/bootstrap.min.css" rel="stylesheet">
+<!--<link type="text/css" href="/static/assets/css/bootstrap.min.css" rel="stylesheet">
 <link type="text/css" href="/static/assets/css/styles.css" rel="stylesheet">
-<link type="text/css" href="/static/assets/css/all.css" rel="stylesheet">
+<link type="text/css" href="/static/assets/css/all.css" rel="stylesheet">-->
+
+<link type="text/css" href="/static/assets/css/bootstrap.min.css" rel="stylesheet">
+<link type="text/css" href="/static/assets/css/fontawesome-all.css" rel="stylesheet">
+<link type="text/css" href="/static/assets/css/styles2.css" rel="stylesheet">
+
 
 {% block stylesheets %}{% endblock stylesheets %}
 
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Flask-Login-Example</a>
-        <ul class="nav">
 
-                {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                <a class="nav-link active"  href="{{ url_for('authentication.logout') }}">  LogOut (Logged-in as {{ current_user.username.title() }})</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                <a class="nav-link active" href="{{ url_for('authentication.login') }}"> LogIn</a>
-            </li>
-            <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('authentication.register') }}"> Register</a>
-                </li>
-                {% endif %}
-        </ul>
-    </nav>
-
-    {% for message in get_flashed_messages() %}
-        <div class="container alert alert-danger" role="alert">
+    {% for message in get_flashed_messages(with_categories=True) %}
+        {% if message[0] == "error" %}
+             <div class="container alert alert-danger" role="alert">
+        {% elif message[0] == "warning" %}
+            <div class="container alert alert-warning" role="alert">
+        {% else %}
+            <div class="container alert alert-success" role="alert">
+        {% endif %}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            {{ message }}
+            {{ message[1] }}
         </div>
     {% endfor %}
 
@@ -47,9 +40,13 @@
 
     {% block javascripts %}
 
-      <script src="/static/assets/js/popper.min.js"></script>
-      <script src="/static/assets/js/bootstrap.min.js"></script>
-      <script src="/static/assets/js/jquery-3.3.1.slim.min.js"></script>
+    <!--<script src="/static/assets/js/popper.min.js"></script>
+    <script src="/static/assets/js/bootstrap.min.js"></script>
+    <script src="/static/assets/js/jquery-3.3.1.slim.min.js"></script>-->
+
+    <script src="/static/assets/js/jquery.min.js"></script>
+    <script src="/static/assets/js/popper.min.js"></script>
+    <script src="/static/assets/js/bootstrap.bundle.min.js"></script>
 
     {% endblock javascripts %}
 
