@@ -115,18 +115,18 @@
                          {% if init %}
                             {% if face_recognized %}
                                 <div class="alert alert-success" style="margin-top:18px;">
-                                    <strong>Yes!</strong> {{ num_faces }} face(s) detected!
+                                    Розпізнано облич – <strong>{{ num_faces }}</strong>
                                 </div>
-                                {% if image_to_show %}
+                            {% else %}
+                                <div class="alert alert-danger" style="margin-top:18px;">
+                                    <strong>Не знайдено</strong> облич на зображенні!
+                                </div>
+                            {% endif %}
+                             {% if image_to_show %}
                                     <div>
                                         <img class="image-preview mx-auto" src="{{ image_to_show }}" width="450" height="400">
                                     </div>
-                                {% endif %}
-                            {% else %}
-                                <div class="alert alert-danger" style="margin-top:18px;">
-                                    <strong>Nope!</strong> No face detected
-                                </div>
-                            {% endif %}
+                             {% endif %}
                         {% endif %}
 
                     </div>
@@ -152,33 +152,27 @@
             </div>
 
                 <div class="text-container">
-                    <h4>DESCRIPTION</h4>
-                    	<p>The project is called the Face Mask Detection where it uses facial and object recognition to accurately distinguish those with or without masks. The user would upload an image and the program would analyze it and output whether or not they're wearing a mask. This project is needed to prevent higher risk of spreading the coronavirus and to enforce those who don't follow proper guidelines to wear a mask.</p>
-					<h4>FEATURES</h4>
+                    <h4>ОПИС ПРОЄКТУ</h4>
+                    	<p>Проєкт Face App розроблено для розпізнання облич з використанням згорточних нейронних мереж.
+                            Задача розпізнавання облич має серйозну практичну перспективу, так
+                            як  цей  метод  ідентифікації  особистості  для  людини  є  природнім  і
+                            реалізовується на інтуїтивному рівні.</p>
+					<h4>ЗАСТОСОВАНІ ЗАСОБИ РОЗРОБКИ</h4>
 						<ul>
                     		<li>Python</li>
-                    		<li>Microsoft Azure Functions</li>
-                    		<li>Deep Learning</li>
+                            <li>Flask</li>
                     		<li>Tensorflow</li>
-                    			<ul>
-                    				<li>Keras</li>
-                    			</ul>
+                            <li>Keras</li>
                     		<li>APIs</li>
                     	</ul>
-                    <h4>IMPORTANCE</h4>
-                    	<p>Wearing a facial mask in public has become a mandatory requirement since the start of COVID-19. They’re important in public space (ex. stadiums, airports, warehouses, and other crowded spaces) where foot traffic is heavy and safety regulations are critical to safeguarding everyone’s health.</p>
-					<h4>PROBLEM &amp; SOLUTION</h4>
-						<ul>
-                    		<li><strong>Problem: </strong>There are people who don’t follow the proper guidelines and thus, create a higher risk of spreading this contagious virus.</li>
-                    		<li><strong>Solution: </strong>Thus, we need to find a solution to figure out how to detect those who don’t wear and mask and enforce them to put one on. This program will analyze images and/or videos of faces and will say whether or not they’re wearing a mask. It will be able to accurately distinguish those with or without masks.</li>
-                    	</ul>
-					<h4>FUTURE PLANS</h4>
-						<ul>
-                    		<li>In the future, I want to integrate this into a webcam where it’s able to detect LIVE of whether or not the person is wearing a mask or not.</li>
-                    		<li>Implementing a Real-time, AI-Based, Face Mask Detector Application for COVID-19</li>
-                    		<li>However, this might not require Azure Functions so it would stray a different path.</li>
-                    	</ul>
-					<h4>Links</h4>
+                    <h4>ПРАКТИЧНА ЦІННІСТЬ</h4>
+                    	<p>В даній роботі була запропонована модель згорткової нейронної мережі, що дозволяє виконувати розпізнання облич у медичній масці. Практична  цінність роботи  полягає  у  можливості  застосування отриманих  результатів  для  ефективного  використання  згорткової нейронної мережі для задачі розпізнавання об’єктів. Розроблена система може бути застосована в системах контроля доступу та ідентифікації особистості.</p>
+
+					<h4>МОЖЛИВІ НАПРЯМКИ РОЗВИТКУ</h4>
+                    <p>напрямом продовження дослідження є аналіз ефективності застосування інших алгоритмів
+класифікації, наприклад, метод k-найближчих сусідів, Naive Bayes, випадкових лісів тощо.</p>
+
+					<h4>ПОСИЛАННЯ</h4>
 						<ul>
     						<li><a href="#">Github</a></li>
                     	</ul>

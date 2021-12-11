@@ -1,6 +1,5 @@
 import os
-from flask import Flask,jsonify,request,render_template
-
+from flask import Flask
 
 
 app = Flask(__name__)
@@ -8,10 +7,8 @@ app = Flask(__name__)
 app.config.from_object('config')
 UPLOAD_FOLDER = os.path.basename('uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['DATASET_FOLDER'] = os.path.basename('dataset')
 
-@app.route('/')
-def home():
-  return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True,

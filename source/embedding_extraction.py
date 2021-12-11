@@ -1,56 +1,53 @@
 import os
-import cv2
-import pickle
+import imutils
+import numpy as np
 from imutils import paths
+from matplotlib import pyplot as plt
 
-def extract_embeddings(classes_dir = "", embeddings_path = ""):
-    # Get models directory
-    models_dir = "models" + os.sep
-    
-    # load our serialized face embedding model from disk
-    print("[INFO] loading face embedding extractor...")
-    face_embedding_model_filename = "openface_nn4.small2.v1.t7"
-    embedder = cv2.dnn.readNetFromTorch(models_dir + face_embedding_model_filename)
-    
-    # Grab the paths to the input images in our dataset
-    print("[INFO] quantifying faces...")
+from source.face_recognition import FaceRecognition
+
+
+def extract_embeddings(classes_dir: str = "", model_path: str = ""):
     image_paths = list(paths.list_images(classes_dir))
 
-    # Initialize our lists of extracted facial embeddings and
-    # corresponding character names
-    known_embeddings = []
-    known_names = []
-    
-    # Initialize the total number of faces processed
-    total = 0
-    
-    # Loop over the image paths
-    for (i, image_path) in enumerate(image_paths):
-        
-    	# Extract the person name from the image path
-        name = image_path.split(os.sep)[-2]
-        
-        print("[INFO] processing image {}/{}".format(i + 1, len(image_paths)) + " - " + image_path.split(os.sep)[-1])
-        
-    	# Load the image
-        face = cv2.imread(image_path)
+    recognition = FaceRecognition()
 
-        # Construct a blob for the face ROI, then pass the blob
-		# through our face embedding model to obtain the 128-d
-		# quantification of the face
-        face_blob = cv2.dnn.blobFromImage(face, 1.0 / 255, (96, 96),
-             (0, 0, 0), swapRB=True, crop=False)
-        embedder.setInput(face_blob)
-        vec = embedder.forward()
+    X = []
+    y = []
+    for k, image_path in enumerate(image_paths):
+        print(f"[INFO] processing image {image_path} --- {k + 1}/{len(image_paths)}")
 
-		# Add the name of the person + corresponding face
-		# embedding to their respective lists
-        known_names.append(name)
-        known_embeddings.append(vec.flatten())
-        total += 1
-    
-    # Dump the facial embeddings + names to disk as pickle
-    print("[INFO] serializing {} encodings...".format(total))
-    data = {"embeddings": known_embeddings, "names": known_names}
-    with open(embeddings_path, "wb") as write_file:
-        pickle.dump(data, write_file)
+        label = image_path.split(os.path.sep)[-2]
+        image_array = recognition.load_image(image_path)
+        if image_array is not None:
+            image_array = imutils.resize(image_array, width=600)
+            faces = recognition.detect_faces(image_array)
+
+            if faces:
+                if len(faces) > 1:
+                    print(f'ERROR - {image_path} - faces - {len(faces)}')
+                    continue
+                    # plt.imshow(face_array)
+                    # plt.title(image_path.split(os.path.sep)[-1])
+                    # plt.show()
+
+                face_array = faces[0]['array']
+                face_keypoints = faces[0]['keypoints']
+                face_array = recognition.align_face(image_array, face_keypoints)
+
+                face_array = recognition.preprocess_face(face_array, target_size=(160, 160))
+                embedding = recognition.get_embeddings(face_array)
+                X.append(embedding)
+                y.append(label)
+            else:
+                print(f'[WARNING] Face is not found: {image_path}')
+
+    np.savez_compressed(f"{model_path}/embeddings-dataset.npz", np.asarray(X), np.asarray(y))
+
+
+if __name__ == '__main__':
+    base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    dataset_path = os.path.join(base_path, "dataset")
+    model_path = os.path.join(base_path, "models")
+
+    extract_embeddings(dataset_path, model_path)

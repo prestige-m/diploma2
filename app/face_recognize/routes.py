@@ -5,11 +5,13 @@ from flask.json import jsonify
 
 from app.face_recognize import recognition
 from source.face_detection import detect_faces_with_ssd
-from source.face_recognition import recognize_faces
+from source.face_recognition import FaceRecognition
 from source.utils import draw_rectangles, read_image, prepare_image
 from source.model_training import create_mlp_model
 from config import DETECTION_THRESHOLD
 from flask import current_app
+
+recognizer = FaceRecognition()
 
 
 @recognition.route('/recognize', methods=['POST'])
@@ -45,17 +47,17 @@ def detect():
 def upload():
     file = request.files['image']
     filename = file.filename
-    path = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
+    image_path = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
 
     # Read image
     image = read_image(file)
-    file.save(path)
+    file.save(image_path)
 
     # Recognize faces
-    classifier_model_path = "models" + os.sep + "lotr_mlp_10c_recognizer.pickle"
-    label_encoder_path = "models" + os.sep + "lotr_mlp_10c_labelencoder.pickle"
-    faces = recognize_faces(image, classifier_model_path, label_encoder_path,
-                            detection_api_url=current_app.config["DETECTION_API_URL"])
+    # faces = recognize_faces(image, classifier_model_path, label_encoder_path,
+    #                         detection_api_url=current_app.config["DETECTION_API_URL"])
+
+    faces = recognizer.identify_face(image_path)
 
     # Draw detection rects
     draw_rectangles(image, faces)

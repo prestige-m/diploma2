@@ -1,176 +1,201 @@
 import os
 import cv2
 import pickle
-import requests
+import imutils
 import numpy as np
-from imutils import paths
 
-from config import DETECTION_THRESHOLD
-from source.face_detection import detect_faces_with_ssd
+from deepface.basemodels.Facenet import InceptionResNetV2
+from collections import Counter
+from mtcnn import MTCNN
+from numpy import ndarray
+from .utils import calc_threshold
+from .create_classifier_model import label_encoder_path, classifier_model_path
+
 
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-def detect_faces_from_api(image, detection_api_url="http://127.0.0.1:3000/"):
-    # Apply previously implemented deep learning-based face detector to 
-    # localize faces in the input image
-    image = cv2.imencode('.jpg', image)[1].tostring()
-
-    # Send request to detection_api_url
-    if not detection_api_url[-1]=="/":
-        detection_api_url += "/"
-
-    response = requests.post(detection_api_url+"detect", files={'image': image}) ## detect
-
-    # Convert response to json object (dictionary)
-    response_json = response.json()
-    # Convert response to json object (dictionary)
-    detections = response_json["detections"]
-    return detections
+models_path = os.path.join(BASE_PATH, "models")
+facenet_model_path = os.path.join(models_path, "facenet_weights.h5")
+test_images_path = os.path.join(BASE_PATH, "test_images")
 
 
-def detect_faces(image):
+class FaceRecognition:
 
-    # Detect faces
-    faces = detect_faces_with_ssd(image, min_confidence=DETECTION_THRESHOLD)
+    def __init__(self):
+        self.deepface_model = InceptionResNetV2()
+        self.deepface_model.load_weights(facenet_model_path)
+        self.detector = MTCNN()
 
-    return faces
+        with open(classifier_model_path, 'rb') as handle:
+            self.recognizer = pickle.load(handle)
+
+        with open(label_encoder_path, 'rb') as handle:
+            self.label_encoder = pickle.load(handle)
+
+    @staticmethod
+    def load_image(image_path: str):
+        image = None
+
+        try:
+            image = cv2.imread(image_path)  # open the image
+            image = image.astype(np.uint8)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # convert the image to RGB format
+        except (AttributeError, cv2.error) as e:
+            print(f'load image error: {e}')
+
+        return image
+
+    @staticmethod
+    def preprocess_face(face_array: ndarray, target_size: tuple = (224, 224)):
+
+        face_array = cv2.resize(face_array, dsize=target_size,
+                                   interpolation=cv2.INTER_CUBIC)
+
+        # scale pixel values
+        face_array = face_array.astype('float32')
+        face_array = face_array / 255.0  # normalize input in [0, 1]
+        face_array = np.expand_dims(face_array, axis=0)
+
+        return face_array
+
+    def detect_faces(self, image_array: ndarray):
+
+        faces = self.detector.detect_faces(image_array)  # get list of face boxes
+        image_height, image_width = image_array.shape[:2]
+
+        face_arrays = []
+        for face in faces:
+            x, y, w, h = face.get('box')
+
+            start_x, start_y = (max(0, x), max(0, y))
+            end_x, end_y = (min(image_width - 1, abs(start_x + w)), min(image_height - 1, abs(start_y + h)))
+            extracted_face = image_array[start_y:end_y, start_x:end_x]
+
+            face_arrays.append({
+                'confidence': face.get('confidence'),
+                'keypoints': face.get('keypoints'),
+                'box': (x, y, w, h),
+                'rect': (start_x, start_y, end_x, end_y),
+                'rect_size': end_x - start_x + end_y - start_y,
+                'array': extracted_face
+            })
+
+        return face_arrays
 
 
-def extract_faces(raw_image_dir = "", detection_api_url="http://127.0.0.1:3000/"):
-    # Extract faces from the images in images/base folder
-    min_confidence = 30
-    
-    # Create export dir
-    faces_dir = raw_image_dir + os.sep + ".." + os.sep + 'faces'
-    os.makedirs(faces_dir, exist_ok=True)
-    
-    # Grab the paths to the input images in our dataset
-    print("[INFO] quantifying faces...")
-    image_paths = list(paths.list_images(raw_image_dir))
-    
-    index = 0
-    # Loop over the image paths
-    for (i, image_path) in enumerate(image_paths):
-        # Extract the person name from the image path
-        print("[INFO] processing image {}/{}".format(i + 1,
-            len(image_paths)))
+    def align_face(self, image_array: ndarray, face_keypoints: dict=None, face_size=(200, 250),
+                    desiredLeftEye = (0.3, 0.26)):
 
-        # Load the image and then resize it
-        image = cv2.imread(image_path)
-        # Get image shape
-        (image_height, image_width) = image.shape[:2]
-        resized_image = cv2.resize(image, (300, 300))
-        #image = resize(image, width=600)
+        if face_keypoints is None:
+            detector = MTCNN()
+            faces = detector.detect_faces(image_array)
+            face_keypoints = faces[0]['keypoints']
 
-        print("[INFO] performing face detection over api for: " + image_path.split("\\")[-1])
-        detections = detect_faces(resized_image) # detection_api_url
-        #detections = detect_faces(image)
-        
-        # Ensure at least one face was found
-        if len(detections) > 0:
-            for detection in detections:
-                # Extract the confidence (i.e., probability) associated with the
-                # prediction 
-                confidence = detection["prob"]
-                
-                # Get detection coords
-                [start_x, start_y, end_x, end_y] = detection["rect"]
-                # Correct the detections regions
-                start_x = int(start_x/300*image_width)
-                start_y = int(start_y/300*image_height)
-                end_x = int(end_x/300*image_width)
-                end_y = int(end_y/300*image_height)
-                
-                # Ensure that the detection with the largest probability also
-            	  # means our minimum probability test (thus helping filter out
-            	  # weak detections)
-                if confidence > min_confidence:
-                    # Extract the face ROI
-                    face = image[start_y :end_y, start_x : end_x]
-                    (fH, fW) = face.shape[:2]
-                    
-                    # Ensure the face width and height are sufficiently large
-                    if fW < 20 or fH < 20:
-                        continue
-                    
-                    face_path = raw_image_dir + os.sep + ".." + os.sep + 'faces' + os.sep + "face" + '_' + str(index) + ".jpg"
-                    print("face_path: " + face_path)
-                    cv2.imwrite(face_path, face)
-                    index = index + 1
-    
-def recognize_faces(image, classifier_model_path, label_encoder_path, detection_api_url="http://127.0.0.1:3000/"):
-    '''Recognize faces in an image'''
-    faces_list = []
-    min_detection_confidence = 20 # percent
-    
-    # Load our serialized face embedding model from disk
-    print("[INFO] loading face recognizer...")
-    #models_dir = os.path.join(BASE_PATH, "models", "openface_nn4.small2.v1.t7")
-    #face_embedding_model_filename = "openface_nn4.small2.v1.t7" # openface.nn4.small2.v1.t7'
+        face_width, face_height = face_size[0], face_size[1]
+        left_eye_center = np.array(face_keypoints['left_eye'])
+        right_eye_center = np.array(face_keypoints['right_eye'])
 
-    face_embedding_model_filename = os.path.join(BASE_PATH, "models", "openface_nn4.small2.v1.t7")
-    embedder = cv2.dnn.readNetFromTorch(face_embedding_model_filename)
-    
-    # Load the actual face recognition model along with the label encoder
+        dx = right_eye_center[0] - left_eye_center[0]
+        dy = right_eye_center[1] - left_eye_center[1]
+        angle = np.arctan2(dy, dx) * 180. / np.pi
 
-    classifier_model_path = os.path.join(BASE_PATH, classifier_model_path)
-    label_encoder_path = os.path.join(BASE_PATH, label_encoder_path)
+        # compute the desired right eye x-coordinate based on the
+        # desired x-coordinate of the left eye
+        desiredRightEyeX = 1.0 - desiredLeftEye[0]
 
-    recognizer = pickle.loads(open(classifier_model_path, "rb").read())
-    label_encoder = pickle.loads(open(label_encoder_path, "rb").read())
-    
-    print("[INFO] performing face detection over api...")
-    detections = detect_faces(image) #, detection_api_url)
-    
-    print("[INFO] performing face recognition...")
-    # Loop over the detections
-    for detection in detections:
-        # Get detection region
-        [start_x, start_y, end_x, end_y] = detection["rect"]
-        # Extract the confidence (i.e., probability) associated with the
-        # prediction 
-        detection_confidence = detection["prob"]
-        
-        # Filter out weak detections
-        if detection_confidence > min_detection_confidence:
-            # Extract the face ROI
-            face = image[start_y:end_y, start_x:end_x]
-            (fH, fW) = face.shape[:2]
-            
-            # Ensure the face width and height are sufficiently large
-            if fW < 20 or fH < 20:
-                continue
-            
-            # Construct a blob for the face ROI, then pass the blob
-            # through our face embedding model to obtain the 128-d
-            # quantification of the face
-            face_blob = cv2.dnn.blobFromImage(face, 1.0 / 255, (96, 96),
-                 (0, 0, 0), swapRB=True, crop=False)
-            embedder.setInput(face_blob)
-            vec = embedder.forward()
-    
-            # Perform classification to recognize the face
-            preds = recognizer.predict_proba(vec)
-            j = np.argmax(preds)
-            # Get recognition confidence
-            try:
-                recognition_confidence = preds[j]
-            except:
-                recognition_confidence = preds[0][j]
-            # Convert it to a native python variable (float)
-            recognition_confidence = recognition_confidence.item()
-            # Get recognition class name
-            name = label_encoder.classes_[j]
-            # Convert it to a native python variable (str)
-            name = name.item()
-    
-            # Append results to list
-            face_dict = {}
-            face_dict['rect'] = [start_x, start_y, end_x, end_y]
-            face_dict['detection_prob'] = detection_confidence
-            face_dict['recognition_prob'] = recognition_confidence * 100
-            face_dict['name'] = name
-            faces_list.append(face_dict)
-            
-    # Return the face image area, the face rectangle, and face name
-    return faces_list
+        # determine the scale of the new resulting image by taking
+        # the ratio of the distance between eyes in the *current*
+        # image to the ratio of distance between eyes in the *desired* image
+        dist = np.sqrt((dx ** 2) + (dy ** 2))
+        desiredDist = (desiredRightEyeX - desiredLeftEye[0])
+        desiredDist *= face_width
+        scale = desiredDist / dist
+
+        # compute center (x, y)-coordinates (i.e., the median point)
+        # between the two eyes in the input image
+        rotate_x = (left_eye_center[0] + right_eye_center[0]) // 2
+        rotate_y = (left_eye_center[1] + right_eye_center[1]) // 2
+        rotate_center = (int(rotate_x), int(rotate_y))
+
+        # grab the rotation matrix for rotating and scaling the face
+        M = cv2.getRotationMatrix2D(rotate_center, angle, scale)
+
+        # update the translation component of the matrix
+        tX = face_width * 0.5
+        tY = face_height * (desiredLeftEye[1] + 0.1)
+        M[0, 2] += (tX - rotate_center[0])
+        M[1, 2] += (tY - rotate_center[1])
+
+        # apply the affine transformation
+        (w, h) = (face_width, face_height)
+        output = cv2.warpAffine(image_array, M, (w, h),
+                                flags=cv2.INTER_CUBIC)
+
+        # return the aligned face
+        return output
+
+
+    def get_embeddings(self, face_pixels: ndarray):
+        embeddings = self.deepface_model.predict(face_pixels)
+
+        return embeddings[0]
+
+    def check_threshold(self, img_embedding, threshold_value=0.80, counts_value=0.55):
+        dataset = np.load(f"{models_path}/embeddings-dataset.npz")
+        embeddings_x, embeddings_y = dataset['arr_0'], dataset['arr_1']
+
+        distances = np.array([calc_threshold(img_embedding, x) for x in embeddings_x])
+        indices = np.where(distances <= threshold_value)[0]
+        found_classes = np.take(embeddings_y, indices)
+        most_common = Counter(found_classes).most_common(1)[0]
+        counts = Counter(embeddings_y)
+
+        return most_common[-1] / counts[most_common[0]] >= counts_value
+
+    def identify_face(self, image_path: str, probability_level: float = 0.0):
+
+        image_array = self.load_image(image_path)
+        result = []
+
+        if image_array is not None:
+            height, width = image_array.shape[:2]
+            if width > 600:
+                image_array = imutils.resize(image_array, width=600)
+            faces = self.detect_faces(image_array)
+
+            for face in faces:
+                face_array = face['array']
+                face_keypoints = face['keypoints']
+                face_array = self.align_face(image_array, face_keypoints)
+                face_array = self.preprocess_face(face_array, target_size=(160, 160))
+                embedding = self.get_embeddings(face_array)
+
+                person_name = "Unknown"
+                probability = 100
+                if self.check_threshold(embedding):
+                    sample_x = np.asarray([embedding])
+                    yhat_class = self.recognizer.predict(sample_x)
+                    yhat_prob = self.recognizer.predict_proba(sample_x)
+
+                    class_index = yhat_class[0]
+                    probability = np.max(yhat_prob)
+                    predict_names = self.label_encoder.inverse_transform(yhat_class)
+                    person_name = predict_names[0] if probability >= probability_level else "Unknown"
+
+                result.append({
+                    'name': person_name,
+                    'rect': list(face['rect']),
+                    'detection_prob': face['confidence'],
+                    'recognition_prob': probability * 100
+                })
+
+        return result
+
+
+if __name__ == '__main__':
+    recognizer = FaceRecognition()
+
+    image_path = os.path.join(test_images_path, "tom_hiddleston.jpg")
+    data = recognizer.identify_face(image_path)
+
+    afasfsa = 32523
+    afafasd = 326523
