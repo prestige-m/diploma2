@@ -17,13 +17,13 @@ def draw_rectangle(image, face):
                   thickness = 2)
     
     # Draw detection probability, if it is present
-    if (face["recognition_prob"] != []):
+    if face.get("recognition_prob"):
         # Create probability text to be drawn over image
 
-        face["name"] = "Unknown"
         text = "{}: {:.2f}%".format(face["name"], face["recognition_prob"])
         # Arrange location of the probability text to be drawn over image
         y = start_y - 10 if start_y - 10 > 10 else start_y + 10
+
         # Arrange color of the probability text to be drawn over image
         probability_color_rgb = (0,0,255) #(0, 255, 255)
         # Draw the probability text over image
@@ -31,10 +31,10 @@ def draw_rectangle(image, face):
                     text = text, 
                     org = (start_x, y), 
                     fontFace = cv2.FONT_HERSHEY_SIMPLEX, 
-                    fontScale = 0.9,
+                    fontScale = 0.6,
                     color = probability_color_rgb, 
                     thickness = 2)
-        
+
 def draw_rectangles(image, faces):
     # Draw rectangle over detections, if any face is detected
     if len(faces) == 0:
@@ -48,7 +48,9 @@ def draw_rectangles(image, faces):
 
 def read_image(file):
     image = cv2.imdecode(np.fromstring(file.read(), np.uint8), cv2.IMREAD_COLOR)
-    #image = imutils.resize(image, width=600)
+    height, width = image.shape[:2]
+    if width > 600:
+        image = imutils.resize(image, width=600)
     return image
 
 def prepare_image(image):

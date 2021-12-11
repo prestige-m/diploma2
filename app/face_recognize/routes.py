@@ -58,9 +58,6 @@ def upload():
     cv2.imwrite(image_path, image)
 
     # Recognize faces
-    # faces = recognize_faces(image, classifier_model_path, label_encoder_path,
-    #                         detection_api_url=current_app.config["DETECTION_API_URL"])
-
     faces = recognizer.identify_face(image_path)
 
     # Draw detection rects

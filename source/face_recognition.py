@@ -142,17 +142,21 @@ class FaceRecognition:
 
         return embeddings[0]
 
-    def check_threshold(self, img_embedding, threshold_value=0.80, counts_value=0.55):
+    def check_threshold(self, img_embedding, threshold_value=1.05, counts_value=0.4): #0.8
         dataset = np.load(f"{models_path}/embeddings-dataset.npz")
         embeddings_x, embeddings_y = dataset['arr_0'], dataset['arr_1']
 
         distances = np.array([calc_threshold(img_embedding, x) for x in embeddings_x])
         indices = np.where(distances <= threshold_value)[0]
-        found_classes = np.take(embeddings_y, indices)
-        most_common = Counter(found_classes).most_common(1)[0]
-        counts = Counter(embeddings_y)
 
-        return most_common[-1] / counts[most_common[0]] >= counts_value
+        res_value = 0
+        if indices.size != 0:
+            found_classes = np.take(embeddings_y, indices)
+            most_common = Counter(found_classes).most_common(1)[0]
+            counts = Counter(embeddings_y)
+            res_value = most_common[-1] / counts[most_common[0]] >= counts_value
+
+        return res_value >= counts_value
 
     def identify_face(self, image_path: str, probability_level: float = 0.0):
 
@@ -160,9 +164,6 @@ class FaceRecognition:
         result = []
 
         if image_array is not None:
-            height, width = image_array.shape[:2]
-            if width > 600:
-                image_array = imutils.resize(image_array, width=600)
             faces = self.detect_faces(image_array)
 
             for face in faces:
@@ -173,7 +174,7 @@ class FaceRecognition:
                 embedding = self.get_embeddings(face_array)
 
                 person_name = "Unknown"
-                probability = 100
+                probability = 1
                 if self.check_threshold(embedding):
                     sample_x = np.asarray([embedding])
                     yhat_class = self.recognizer.predict(sample_x)
@@ -187,8 +188,8 @@ class FaceRecognition:
                 result.append({
                     'name': person_name,
                     'rect': list(face['rect']),
-                    'detection_prob': face['confidence'],
-                    'recognition_prob': probability * 100
+                    'detection_prob': float(face['confidence']),
+                    'recognition_prob': float(probability) * 100
                 })
 
         return result
