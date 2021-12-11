@@ -1,7 +1,7 @@
 from flask import render_template, request, flash, redirect, url_for
 from app.auth.forms import RegistrationForm, LoginForm
 from app.auth import authentication
-from app.auth.models import User
+from app.auth.models import User, Counter
 from flask_login import login_user, logout_user, login_required, current_user
 
 
@@ -37,7 +37,8 @@ def register():
 
 @authentication.route('/')
 def index():
-    return render_template('index.html')
+    counter_value = Counter.get()
+    return render_template('index.html', counter_value=counter_value)
 
 @authentication.route('/login', methods=['GET','POST'])
 def login():
@@ -59,7 +60,8 @@ def login():
 
 @authentication.route('/homepage')
 def homepage():
-    return render_template('index.html')
+    counter_value = Counter.get()
+    return render_template('index.html', counter_value=counter_value)
 
 
 @authentication.route('/logout', methods=['GET'])

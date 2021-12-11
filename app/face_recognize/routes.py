@@ -3,6 +3,7 @@ import os
 from flask import render_template, request, flash, redirect, url_for
 from flask.json import jsonify
 
+from app.auth.models import Counter
 from app.face_recognize import recognition
 from source.face_detection import detect_faces_with_ssd
 from source.face_recognition import FaceRecognition
@@ -65,9 +66,11 @@ def upload():
 
     # Prepare image for html
     to_send = prepare_image(image)
+    Counter.update()
+    counter_value = Counter.get()
 
     return render_template('index.html', face_recognized=len(faces) > 0, num_faces=len(faces), image_to_show=to_send,
-                           init=True)
+                           init=True, counter_value=counter_value)
 
 
 

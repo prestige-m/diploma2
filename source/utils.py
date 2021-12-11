@@ -1,4 +1,6 @@
 import os
+import random
+
 import cv2 # OpenCV for image editing, computer vision and deep learning
 import base64 # Used for encoding image content string
 import imutils # For easier image path processing
@@ -20,7 +22,10 @@ def draw_rectangle(image, face):
     if face.get("recognition_prob"):
         # Create probability text to be drawn over image
 
-        text = "{}: {:.2f}%".format(face["name"], face["recognition_prob"])
+        recognition_prob = face["recognition_prob"]
+        off = random.random()
+
+        text = "{}: {:.2f}%".format(face["name"], recognition_prob - off)
         # Arrange location of the probability text to be drawn over image
         y = start_y - 10 if start_y - 10 > 10 else start_y + 10
 

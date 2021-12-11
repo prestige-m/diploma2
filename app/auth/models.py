@@ -39,3 +39,22 @@ def request_loader(request):
     username = request.form.get('username')
     user = User.query.filter_by(username=username).first()
     return user if user else None
+
+
+class Counter(db.Model):
+    __tablename__ = 'counter'
+
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.Integer)
+
+    @classmethod
+    def update(cls):
+        counter = Counter.query.get(1)
+        counter.value = 1 + counter.value
+        db.session.commit()
+
+    @classmethod
+    def get(cls):
+        counter = Counter.query.get(1)
+        return counter.value
+
