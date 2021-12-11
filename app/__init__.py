@@ -28,6 +28,9 @@ def create_app():
     app.register_blueprint(authentication)
     app.register_blueprint(recognition)
 
-    app.config['BASE_PATH'] = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    app.config['ROOT_PATH'] = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.config['ROOT_PATH'], "uploads")
+    app.config['DATASET_FOLDER'] = os.path.join(app.config['ROOT_PATH'], "dataset")
+    app.config['MODELS_FOLDER'] = os.path.join(app.config['ROOT_PATH'], "models")
 
     return app

@@ -1,6 +1,8 @@
+import os
 from app import create_app, db
 from app.auth.models import User
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 flask_app = create_app()
 with flask_app.app_context():

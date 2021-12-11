@@ -1,15 +1,17 @@
 import os
+
+import PIL
 import cv2
 import pickle
 import imutils
+import numpy
 import numpy as np
 
 from deepface.basemodels.Facenet import InceptionResNetV2
 from collections import Counter
 from mtcnn import MTCNN
 from numpy import ndarray
-from .utils import calc_threshold
-from .create_classifier_model import label_encoder_path, classifier_model_path
+from source import calc_threshold, label_encoder_path, classifier_model_path
 
 
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,6 +41,7 @@ class FaceRecognition:
             image = cv2.imread(image_path)  # open the image
             image = image.astype(np.uint8)
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # convert the image to RGB format
+
         except (AttributeError, cv2.error) as e:
             print(f'load image error: {e}')
 

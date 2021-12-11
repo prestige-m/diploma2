@@ -10,6 +10,9 @@ from source.utils import draw_rectangles, read_image, prepare_image
 from source.model_training import create_mlp_model
 from config import DETECTION_THRESHOLD
 from flask import current_app
+from PIL import Image
+import PIL
+import cv2
 
 recognizer = FaceRecognition()
 
@@ -51,7 +54,8 @@ def upload():
 
     # Read image
     image = read_image(file)
-    file.save(image_path)
+    #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    cv2.imwrite(image_path, image)
 
     # Recognize faces
     # faces = recognize_faces(image, classifier_model_path, label_encoder_path,
