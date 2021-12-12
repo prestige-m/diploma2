@@ -22,6 +22,9 @@ jQuery(document).ready(function ($) {
 
 
 var showImage = function(event) {
+    var output2 = document.getElementById("recognized-image");
+    output2.innerHTML = "";
+
     var output = document.getElementById("converted-image");
     output.src = URL.createObjectURL(event.target.files[0]);
     output.style.display = 'block';
@@ -31,6 +34,9 @@ var showImage = function(event) {
 };
 
 var showImage2 = function(event) {
+    var output2 = document.getElementById("recognized-image");
+    output2.innerHTML = "";
+
     var output = document.getElementById("converted-image2");
     output.src = URL.createObjectURL(event.target.files[0]);
     output.style.display = 'block';
@@ -39,33 +45,55 @@ var showImage2 = function(event) {
     }
 };
 
+function showForm1() {
+    document.getElementById("form-group2").style.display = 'none';
+    document.getElementById("form-group1").style.display = 'block';
+}
 
-/*
-window.addEventListener('DOMContentLoaded', event => {
+function showForm2() {
+    document.getElementById("form-group1").style.display = 'none';
+    document.getElementById("form-group2").style.display = 'block';
+}
 
-    // Activate Bootstrap scrollspy on the main nav element
-    const mainNav = document.body.querySelector('#mainNav');
-    if (mainNav) {
-        new bootstrap.ScrollSpy(document.body, {
-            target: '#mainNav',
-            offset: 74,
+$( "#new-form" ).submit(function( event ) {
+
+    // Stop form from submitting normally
+    event.preventDefault();
+
+    // Get some values from elements on the page:
+    var $form = $(this);
+    var option1 = $form.find("input[name='option1']").parent().hasClass("active");
+    var option2 = $form.find("input[name='option2']").parent().hasClass("active");
+    var text1 = $("#new-form #formControlSelect1").find(":selected").text();
+    var text2 = $("#new-form input[name=exampleInput]").val();
+    var url = $form.attr("action");
+
+
+    // // Send the data using post
+    // var posting = $.post(url, {
+    //     "option1": option1, "option2": option2,
+    //     "text1": text1, "text2": text2
+    // });
+
+    var formData = new FormData();
+    var files = $('#picture1')[0].files;
+
+    formData.append("option1", option1);
+    formData.append("option2", option2);
+    formData.append("text1", text1);
+    formData.append("text2", text2);
+
+    // Check file selected or not
+    if (files.length > 0) {
+        formData.append('image', files[0]);
+
+        $.ajax({
+            url: url,
+            type: 'post',
+            data: formData,
+            contentType: false,
+            processData: false
         });
-    };
-
-    // Collapse responsive navbar when toggler is visible
-    const navbarToggler = document.body.querySelector('.navbar-toggler');
-    const responsiveNavItems = [].slice.call(
-        document.querySelectorAll('#navbarResponsive .nav-link')
-    );
-    responsiveNavItems.map(function (responsiveNavItem) {
-        responsiveNavItem.addEventListener('click', () => {
-            if (window.getComputedStyle(navbarToggler).display !== 'none') {
-                navbarToggler.click();
-            }
-        });
-    });
+    }
 
 });
-
-*/
-

@@ -1,50 +1,16 @@
+import json
 import os
 
-from flask import render_template, request, flash, redirect, url_for
-from flask.json import jsonify
-
+from flask import render_template, request
 from app.auth.models import Counter
 from app.face_recognize import recognition
-from source.face_detection import detect_faces_with_ssd
+from source.create_classifier_model import add_new_class
 from source.face_recognition import FaceRecognition
 from source.utils import draw_rectangles, read_image, prepare_image
-from source.model_training import create_mlp_model
-from config import DETECTION_THRESHOLD
 from flask import current_app
-from PIL import Image
-import PIL
 import cv2
 
 recognizer = FaceRecognition()
-
-
-@recognition.route('/recognize', methods=['POST'])
-def recognize():
-    file = request.files['image']
-
-    # Read image
-    image = read_image(file)
-
-    # Recognize faces
-    classifier_model_path = "models" + os.sep + "lotr_mlp_10c_recognizer.pickle"
-    label_encoder_path = "models" + os.sep + "lotr_mlp_10c_labelencoder.pickle"
-    faces = recognize_faces(image, classifier_model_path, label_encoder_path,
-                            detection_api_url=current_app.config["DETECTION_API_URL"])
-
-    return jsonify(recognitions=faces)
-
-
-@recognition.route('/detect', methods=['POST'])
-def detect():
-    file = request.files['image']
-
-    # Read image
-    image = read_image(file)
-
-    # Detect faces
-    faces = detect_faces_with_ssd(image, min_confidence=DETECTION_THRESHOLD)
-
-    return jsonify(detections=faces)
 
 
 @recognition.route('/upload', methods=['POST'])
@@ -69,13 +35,47 @@ def upload():
     Counter.update()
     counter_value = Counter.get()
 
-    return render_template('index.html', face_recognized=len(faces) > 0, num_faces=len(faces), image_to_show=to_send,
-                           init=True, counter_value=counter_value)
+    with open(f"{current_app.config['ROOT_PATH']}/classes.json", encoding='utf-8') as file:
+        classes = json.load(file)
 
+    return render_template('index.html', face_recognized=len(faces) > 0, num_faces=len(faces), image_to_show=to_send,
+                           init=True, counter_value=counter_value, classes=classes)
 
 
 @recognition.route('/add-image', methods=['POST'])
 def add_image():
 
-    pass
+    selected_class = ""
+    if request.form["option1"] == 'true':
+        selected_class = request.form["text1"]
+    elif request.form["option2"] == 'true':
+        selected_class = request.form["text2"]
+
+    file = request.files['image']
+    filename = file.filename
+
+    # Read image
+    image = read_image(file)
+    output_message = f"Клас <strong>{selected_class}</strong> успішно додано!"
+    error = False
+    try:
+        add_new_class(selected_class, image)
+    except:
+        output_message = "Виникла помилка при додаванні класу!"
+        error = True
+
+    Counter.update()
+    counter_value = Counter.get()
+
+    with open(f"{current_app.config['ROOT_PATH']}/classes.json", encoding='utf-8') as file:
+        classes = json.load(file)
+
+    classes.append(selected_class)
+    with open(f"{current_app.config['ROOT_PATH']}/classes.json", 'w', encoding='utf-8') as file:
+        json.dump(classes, file, ensure_ascii=False, indent=2)
+
+    return render_template('index.html', output_message=output_message, error=error, init_add=True,
+                           counter_value=counter_value, classes=classes)
+
+
 

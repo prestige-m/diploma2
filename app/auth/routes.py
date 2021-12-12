@@ -1,4 +1,6 @@
-from flask import render_template, request, flash, redirect, url_for
+import json
+
+from flask import render_template, request, flash, redirect, url_for, current_app
 from app.auth.forms import RegistrationForm, LoginForm
 from app.auth import authentication
 from app.auth.models import User, Counter
@@ -38,7 +40,9 @@ def register():
 @authentication.route('/')
 def index():
     counter_value = Counter.get()
-    return render_template('index.html', counter_value=counter_value)
+    with open(f"{current_app.config['ROOT_PATH']}/classes.json", encoding='utf-8') as file:
+        classes = json.load(file)
+    return render_template('index.html', counter_value=counter_value, classes=classes)
 
 @authentication.route('/login', methods=['GET','POST'])
 def login():
@@ -61,7 +65,10 @@ def login():
 @authentication.route('/homepage')
 def homepage():
     counter_value = Counter.get()
-    return render_template('index.html', counter_value=counter_value)
+    with open(f"{current_app.config['ROOT_PATH']}/classes.json", encoding='utf-8') as file:
+        classes = json.load(file)
+
+    return render_template('index.html', counter_value=counter_value, classes=classes)
 
 
 @authentication.route('/logout', methods=['GET'])

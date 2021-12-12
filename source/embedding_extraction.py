@@ -7,7 +7,8 @@ from matplotlib import pyplot as plt
 from source.face_recognition import FaceRecognition
 
 
-def extract_embeddings(classes_dir: str = "", model_path: str = ""):
+def extract_embeddings(classes_dir: str = "", model_path: str = "", default_classname: str=None,
+                       one_face_limit=True, save_dataset=True):
     image_paths = list(paths.list_images(classes_dir))
 
     recognition = FaceRecognition()
@@ -17,14 +18,16 @@ def extract_embeddings(classes_dir: str = "", model_path: str = ""):
     for k, image_path in enumerate(image_paths):
         print(f"[INFO] processing image {image_path} --- {k + 1}/{len(image_paths)}")
 
-        label = image_path.split(os.path.sep)[-2]
+        label = image_path.split(os.path.sep)[-2] if not default_classname else default_classname
         image_array = recognition.load_image(image_path)
         if image_array is not None:
-            image_array = imutils.resize(image_array, width=600)
+            height, width = image_array.shape[:2]
+            if width > 600:
+                image_array = imutils.resize(image_array, width=600)
             faces = recognition.detect_faces(image_array)
 
             if faces:
-                if len(faces) > 1:
+                if one_face_limit and len(faces) > 1:
                     print(f'ERROR - {image_path} - faces - {len(faces)}')
                     continue
                     # plt.imshow(face_array)
@@ -42,7 +45,10 @@ def extract_embeddings(classes_dir: str = "", model_path: str = ""):
             else:
                 print(f'[WARNING] Face is not found: {image_path}')
 
-    np.savez_compressed(f"{model_path}/embeddings-dataset.npz", np.asarray(X), np.asarray(y))
+    if save_dataset:
+        np.savez_compressed(f"{model_path}/embeddings-dataset.npz", np.asarray(X), np.asarray(y))
+
+    return np.asarray(X), np.asarray(y)
 
 
 if __name__ == '__main__':

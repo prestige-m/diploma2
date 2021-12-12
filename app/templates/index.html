@@ -36,22 +36,23 @@
 
                 <ul class="nav nav-tabs" id="tabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="nav-tab-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true"><i class="far fa-image"></i>ДОДАТИ ЗОБРАЖЕННЯ</a>
+                        <a class="nav-link active" id="nav-tab-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true"><i class="far fa-image"></i>РОЗПІЗНАТИ ЗОБРАЖЕННЯ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="nav-tab-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2" aria-selected="false"><i class="fas fa-cogs"></i>РОЗПІЗНАТИ ЗОБРАЖЕННЯ</a>
+                        <a class="nav-link" id="nav-tab-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2" aria-selected="false"><i class="fas fa-cogs"></i>ДОДАТИ ЗОБРАЖЕННЯ</a>
                     </li>
                 </ul>
                 <!-- Tabs Content-->
                 <div class="tab-content d-flex justify-content-center" id="MyTabsContent">
 
                     <!-- Tab -->
-                    <div class="tab-pane fade" id="tab-2" role="tabpanel" aria-labelledby="tab-2">
+                <div class="tab-pane fade show active" id="tab-1" role="tabpanel" aria-labelledby="tab-1">
+
                         <div class="container">
                             <form action="/upload"  method="post" enctype="multipart/form-data" >
                                 <div class="row">
                                     <div class = "col-md-12">
-                                        <label class="btn btn-default btn-file btn-block">
+                                        <label id="load-image" class="btn btn-default btn-file btn-block mx-auto">
                                             <i class="far fa-file-image"></i>ЗАВАНТАЖИТИ ФАЙЛ
                                             <input type="file" name="image" id="picture" required="true" accept="image/*" onchange="showImage2(event)" style="display: none;">
                                         </label>
@@ -60,7 +61,7 @@
 
                                 <div class="row">
                                     <div class = "col-md-12">
-                                        <button id="submit-image" type="submit" class="btn btn-block"><i class="far fa-laugh-wink"></i>РОЗПІЗНАТИ&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                                        <button id="submit-image" type="submit" class="btn btn-block mx-auto"><i class="far fa-laugh-wink"></i>РОЗПІЗНАТИ&nbsp;&nbsp;&nbsp;&nbsp;</button>
                                     </div>
                                 </div> <!-- end of row -->
 
@@ -68,76 +69,117 @@
 
                             <div class="row mt-4">
                                 <div class = "col-md-6 col-lg-6">
-                                    <img class="image-preview mx-auto" id="converted-image2" width="300" height="300" style="display: none;">
+                                    <img class="image-preview mx-auto" id="converted-image2" width="450" height="400" style="display: none;">
                                 </div>
 
                             </div>
 
                         </div> <!-- end of container -->
+
+                    <div class="container">
+                        <div class="row mt-4">
+                            <div id="recognized-image" class="col-md-12">
+                                 {% if init %}
+                                    {% if face_recognized %}
+                                        <div class="alert alert-success" style="margin-top:18px;">
+                                            Розпізнано облич – <strong>{{ num_faces }}</strong>
+                                        </div>
+                                    {% else %}
+                                        <div class="alert alert-danger" style="margin-top:18px;">
+                                            <strong>Не знайдено</strong> облич на зображенні!
+                                        </div>
+                                    {% endif %}
+                                     {% if image_to_show %}
+                                            <div>
+                                                <img class="image-preview mx-auto" src="{{ image_to_show }}" width="450" height="400">
+                                            </div>
+                                     {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+
                     </div> <!-- end of tab-pane -->
                     <!-- end of tab -->
                     <!--TAB 2 -->
-                    <div class="tab-pane fade show active" id="tab-1" role="tabpanel" aria-labelledby="tab-1">
+                    <div class="tab-pane fade" id="tab-2" role="tabpanel" aria-labelledby="tab-2">
                         <div class="container">
 
-                            <form action="/add-image"  method="post" enctype="multipart/form-data" >
-                            <div class="row">
-                                <div class = "col-md-12">
-                                    <label class="btn btn-default btn-file btn-block">
-                                        <i class="far fa-file-image"></i>ЗАВАНТАЖИТИ ФАЙЛ&nbsp;&nbsp;
-                                        <input type="file" name="image" id="picture" required="true" accept="image/*" onchange="showImage(event)" style="display: none;">
-                                    </label>
-                                </div>
+                            <form id="new-form" action="/add-image"  method="post" enctype="multipart/form-data" >
 
+                            <div class="btn-group btn-group-toggle mb-4" data-toggle="buttons">
+                              <label class="btn btn-secondary active" onclick="showForm1();">
+                                <input type="radio" name="option1" id="option1"  autocomplete="off" checked> Вибір класу
+                              </label>
+                              <label class="btn btn-secondary" onclick="showForm2();">
+                                <input type="radio" name="option2" id="option2"  autocomplete="off"> Новий клас
+                              </label>
+                            </div>
+
+                            <div class="row">
+                                <div id="form-group1" class="col-md-12">
+                                   <div class="form-group">
+                                    <label for="formControlSelect1">Виберіть назву класу:</label>
+                                    <select class="form-control" id="formControlSelect1">
+
+                                      <option value="{{classes[0]}}" selected>{{classes[0]}}</option>
+                                      {% for class in classes[1:] %}
+                                        <option value="{{class}}">{{class}}</option>
+                                      {% endfor %}
+
+                                    </select>
+                                  </div>
+                                </div>
+                                <div id="form-group2" class="col-md-12" style="display: none;">
+                                   <div class="form-group">
+                                        <label for="exampleInput">Введіть назву класу:</label>
+                                        <input name="exampleInput" type="text" class="form-control" id="exampleInput"  placeholder="">
+                                   </div>
+                                </div>
                             </div>
 
                             <div class="row">
                                 <div class = "col-md-12">
-                                  <button id="submit-image" type="submit" class="btn btn-block" ><i class="fas fa-plus"></i>ДОДАТИ ЗОБРАЖЕННЯ</button>
+                                    <label id="load-image" class="btn btn-default btn-file btn-block mx-auto">
+                                        <i class="far fa-file-image"></i>ЗАВАНТАЖИТИ ФАЙЛ&nbsp;&nbsp;
+                                        <input type="file" name="image" id="picture1" required="true" accept="image/*" onchange="showImage(event)" style="display: none;">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class = "col-md-12">
+                                  <button id="submit-image" type="submit" class="btn btn-block mx-auto" ><i class="fas fa-plus"></i>ДОДАТИ ЗОБРАЖЕННЯ</button>
                                 </div>
                             </div> <!-- end of row -->
                             </form>
 
+                                {% if init_add %}
+                                    {% if error %}
+                                        <div class="alert alert-danger" style="margin-top:18px;">
+                                            {{ output_message }}
+                                        </div>
+                                    {% else %}
+                                        <div class="alert alert-success" style="margin-top:18px;">
+                                            {{ output_message }}
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
 
                             <div class="row mt-4">
-                                <div class = "col-md-6 col-lg-6">
-                                    <img class="image-preview mx-auto" id="converted-image" width="300" height="300" style="display: none;">
+                                <div class = "col-md-12 col-lg-12">
+                                    <img class="image-preview mx-auto" id="converted-image" width="450" height="400" style="display: none;">
                                 </div>
 
                             </div>
 
-
                         </div> <!-- end of container -->
 
-
-                <div class="row mt-4">
-                    <div class = "col-md-12">
-                         {% if init %}
-                            {% if face_recognized %}
-                                <div class="alert alert-success" style="margin-top:18px;">
-                                    Розпізнано облич – <strong>{{ num_faces }}</strong>
-                                </div>
-                            {% else %}
-                                <div class="alert alert-danger" style="margin-top:18px;">
-                                    <strong>Не знайдено</strong> облич на зображенні!
-                                </div>
-                            {% endif %}
-                             {% if image_to_show %}
-                                    <div>
-                                        <img class="image-preview mx-auto" src="{{ image_to_show }}" width="450" height="400">
-                                    </div>
-                             {% endif %}
-                        {% endif %}
-
                     </div>
-                </div>
+                    </div>
 
                 </div>
-
-                </div>
-                </div>
-
-
 
             </div>
         </section>

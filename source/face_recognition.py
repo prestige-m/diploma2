@@ -27,11 +27,6 @@ class FaceRecognition:
         self.deepface_model.load_weights(facenet_model_path)
         self.detector = MTCNN()
 
-        with open(classifier_model_path, 'rb') as handle:
-            self.recognizer = pickle.load(handle)
-
-        with open(label_encoder_path, 'rb') as handle:
-            self.label_encoder = pickle.load(handle)
 
     @staticmethod
     def load_image(image_path: str):
@@ -154,11 +149,17 @@ class FaceRecognition:
             found_classes = np.take(embeddings_y, indices)
             most_common = Counter(found_classes).most_common(1)[0]
             counts = Counter(embeddings_y)
-            res_value = most_common[-1] / counts[most_common[0]] >= counts_value
+            res_value = most_common[-1] / counts[most_common[0]]
 
         return res_value >= counts_value
 
     def identify_face(self, image_path: str, probability_level: float = 0.0):
+
+        with open(classifier_model_path, 'rb') as handle:
+            self.recognizer = pickle.load(handle)
+
+        with open(label_encoder_path, 'rb') as handle:
+            self.label_encoder = pickle.load(handle)
 
         image_array = self.load_image(image_path)
         result = []

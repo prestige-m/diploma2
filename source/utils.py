@@ -36,7 +36,7 @@ def draw_rectangle(image, face):
                     text = text, 
                     org = (start_x, y), 
                     fontFace = cv2.FONT_HERSHEY_SIMPLEX, 
-                    fontScale = 0.6,
+                    fontScale = 0.8,
                     color = probability_color_rgb, 
                     thickness = 2)
 
