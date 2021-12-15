@@ -150,22 +150,13 @@
 
                             <div class="row">
                                 <div class = "col-md-12">
-                                  <button id="submit-image" type="submit" class="btn btn-block mx-auto" ><i class="fas fa-plus"></i>ДОДАТИ ЗОБРАЖЕННЯ</button>
+                                  <button id="submit-image1" type="submit" class="btn btn-block mx-auto fa-3x">
+                                      <i class="fas fa-plus"></i>ДОДАТИ ЗОБРАЖЕННЯ</button>
                                 </div>
                             </div> <!-- end of row -->
                             </form>
 
-                                {% if init_add %}
-                                    {% if error %}
-                                        <div class="alert alert-danger" style="margin-top:18px;">
-                                            {{ output_message }}
-                                        </div>
-                                    {% else %}
-                                        <div class="alert alert-success" style="margin-top:18px;">
-                                            {{ output_message }}
-                                        </div>
-                                    {% endif %}
-                                {% endif %}
+                                <div id="msg"></div>
 
                             <div class="row mt-4">
                                 <div class = "col-md-12 col-lg-12">

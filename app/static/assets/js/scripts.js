@@ -83,6 +83,13 @@ $( "#new-form" ).submit(function( event ) {
     formData.append("text1", text1);
     formData.append("text2", text2);
 
+    var selectedClass = text1;
+    if (option2) {
+        selectedClass = text2;
+    }
+    console.log(option1, option2, selectedClass);
+    $( "#submit-image1").html( "<i class=\"fas fa-spinner fa-spin\"></i> Виконання запиту..." ).addClass( "disabled" );
+
     // Check file selected or not
     if (files.length > 0) {
         formData.append('image', files[0]);
@@ -92,7 +99,17 @@ $( "#new-form" ).submit(function( event ) {
             type: 'post',
             data: formData,
             contentType: false,
-            processData: false
+            processData: false,
+            success: function(data){
+                 $('#msg').after(`<div class="alert alert-success mt-2" >Клас <strong>${selectedClass}</strong> успішно додано!<button type="button" class="close" onclick="$(this).parent().remove();">&times;</button></div>`);
+		    },
+            error: function(data){
+                $('#msg').after('<div class="alert alert-danger mt-2">Виникла помилка при додаванні класу!' +
+                    '<button type="button" class="close" onclick="$(this).parent().remove();">&times;</button></div>');
+            },
+            complete: function(data) {
+                $( "#submit-image1").html( "<i class=\"fas fa-plus\"></i>ДОДАТИ ЗОБРАЖЕННЯ" ).removeClass( "disabled" );
+            }
         });
     }
 
