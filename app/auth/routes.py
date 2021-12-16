@@ -27,11 +27,12 @@ def register():
             flash("Користувач з такою електронною адресою вже існує!", "error")
             return render_template('registration.html', form=form, success=False)
 
-        User.create_user(
+        curr_user = User.create_user(
             username=form.username.data,
             email=form.email.data,
             password=form.password.data
         )
+        login_user(curr_user, True)
         flash("Реєстрація успішна!", "success")
         return redirect(url_for('authentication.homepage'))
         
